@@ -24,43 +24,18 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSION_REQUEST_CODE = 333;
+
     int[] images = {
-            R.mipmap.m01,
-            R.mipmap.m02,
-            R.mipmap.m03,
-            R.mipmap.m04,
-            R.mipmap.m05,
-            R.mipmap.m06,
-
-            R.mipmap.m01,
-            R.mipmap.m02,
-            R.mipmap.m03,
-            R.mipmap.m04,
-            R.mipmap.m05,
-            R.mipmap.m06,
-
-            R.mipmap.m01,
-            R.mipmap.m02,
-            R.mipmap.m03,
-            R.mipmap.m04,
-            R.mipmap.m05,
-            R.mipmap.m06,
-
-            R.mipmap.m01,
-            R.mipmap.m02,
-            R.mipmap.m03,
-            R.mipmap.m04,
-            R.mipmap.m05,
-            R.mipmap.m06,
-
-            R.mipmap.m01,
-            R.mipmap.m02,
-            R.mipmap.m03,
-            R.mipmap.m04,
-            R.mipmap.m05,
-            R.mipmap.m06
-
-
+            R.drawable.m01,
+            R.drawable.m02,
+            R.drawable.m03,
+            R.drawable.m04,
+            R.drawable.m05,
+            R.drawable.m06,
+            R.drawable.m07,
+            R.drawable.m08,
+            R.drawable.m09,
+            R.drawable.m10
     };
     private static final File OUTPUT_DIR = Environment.getExternalStorageDirectory();
 
@@ -129,16 +104,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 第 4 步: 备份通讯录操作
-     */
     private void doBackup() {
         // 本文主旨是讲解如果动态申请权限, 具体备份代码不再展示, 就假装备份一下
         Toast.makeText(this, "正在将图片转为avi...", Toast.LENGTH_SHORT).show();
 
-        test();
+//        test();
 
-        new EncodeAndMuxTest().testEncodeVideoToMp4();
+        new EncodeAndMuxTest().testEncodeVideoToMp4(this, images);
     }
 
     /**
@@ -163,17 +135,17 @@ public class MainActivity extends AppCompatActivity {
         builder.setNegativeButton("取消", null);
         builder.show();
     }
-
-    private void test() {
-        String outputPath = new File(OUTPUT_DIR,
-                "test.avi").toString();
-        Log.i("test", "-outputPath=" + outputPath);
-        for (int i = 0; i < images.length; i++) {
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), images[i]);
-            ImageVideoConverter.convertImageToVideo(bitmap, 6, 1024, 760, outputPath);
-            Log.i("test", "-i=" + i);
-        }
-    }
+//
+//    private void test() {
+//        String outputPath = new File(OUTPUT_DIR,
+//                "test.avi").toString();
+//        Log.i("test", "-outputPath=" + outputPath);
+//        for (int i = 0; i < images.length; i++) {
+//            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), images[i]);
+//            ImageVideoConverter.convertImageToVideo(bitmap, 6, 1024, 760, outputPath);
+//            Log.i("test", "-i=" + i);
+//        }
+//    }
 
     /**
      * 检查是否拥有指定的所有权限

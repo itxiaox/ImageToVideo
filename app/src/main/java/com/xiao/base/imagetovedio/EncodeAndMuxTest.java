@@ -19,6 +19,9 @@ package com.xiao.base.imagetovedio;
  * limitations under the License.
  */
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
@@ -60,9 +63,9 @@ public class EncodeAndMuxTest {
 
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int FRAME_RATE = 15;               // 15fps
+    private static final int FRAME_RATE = 4;               // 15fps
     private static final int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
-    private static final int NUM_FRAMES = 30;               // two seconds of video
+    private static final int NUM_FRAMES = 60;               // two seconds of video
 
     // RGB color values for generated frames
     private static final int TEST_R0 = 0;
@@ -87,27 +90,44 @@ public class EncodeAndMuxTest {
 
     // allocate one of these up front so we don't need to do it every time
     private MediaCodec.BufferInfo mBufferInfo;
+    private GLHelper drawer;
 
 
+
+    private Bitmap getBitmap(Context context,int[] images,int frameIndex){
+        int resId = images[frameIndex%10];
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        return BitmapFactory.decodeResource(context.getResources(),resId, options);
+    }
     /**
      * Tests encoding of AVC video from a Surface.  The output is saved as an MP4 file.
      */
-    public void testEncodeVideoToMp4() {
+    public void testEncodeVideoToMp4(Context context,int[] images) {
+        Bitmap img = getBitmap(context, images, 0);
+
         // QVGA at 2Mbps
-        mWidth = 320;
-        mHeight = 240;
-        mBitRate = 2000000;
+        // multiple of 4.
+        mWidth = ((img.getWidth()+3)/4)*4; //640;
+        mHeight = ((img.getHeight()+3)/4)*4; //480;
+        mBitRate = 2*1024*1024;
+        img.recycle();
 
         try {
             prepareEncoder();
             mInputSurface.makeCurrent();
 
+            initializeGL(mWidth, mHeight);
             for (int i = 0; i < NUM_FRAMES; i++) {
                 // Feed any pending encoder output into the muxer.
                 drainEncoder(false);
 
+
+                Bitmap bitmap = getBitmap(context,images,i);
+                /// TODO: 2018/1/5  得到当前bitmap ,需要补充将bitmap通过opengl渲染出来 
                 // Generate a new frame of input.
-                generateSurfaceFrame(i);
+                //generateSurfaceFrame(i);
+                drawBitmap(bitmap, i);
                 mInputSurface.setPresentationTime(computePresentationTimeNsec(i));
 
                 // Submit it to the encoder.  The eglSwapBuffers call will block if the input
@@ -294,6 +314,20 @@ public class EncodeAndMuxTest {
                 }
             }
         }
+    }
+
+
+
+    private void initializeGL(int width, int height) {
+        drawer = new GLHelper();
+        drawer.init(width, height);
+    }
+
+    private void drawBitmap(Bitmap img, int frameIndex) {
+        //float gray = (float)(frameIndex%FRAME_RATE)/FRAME_RATE;
+        //GLES20.glClearColor(gray, gray, gray, 1.0f);
+        //GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        drawer.draw(img);
     }
 
     /**
