@@ -11,13 +11,16 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,19 +29,15 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSION_REQUEST_CODE = 333;
 
     int[] images = {
-            R.drawable.m01,
-            R.drawable.m02,
-            R.drawable.m03,
-            R.drawable.m04,
-            R.drawable.m05,
-            R.drawable.m06,
-            R.drawable.m07,
-            R.drawable.m08,
-            R.drawable.m09,
-            R.drawable.m10
+            R.drawable.img1,
+            R.drawable.img2,
+            R.drawable.img3,
+            R.drawable.img4,
+            R.drawable.img5
     };
     private static final File OUTPUT_DIR = Environment.getExternalStorageDirectory();
 
+    Button btn_image_to_video;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +70,13 @@ public class MainActivity extends AppCompatActivity {
                 },
                 MY_PERMISSION_REQUEST_CODE
         );
-
-
+        btn_image_to_video = findViewById(R.id.btn_image_to_video);
+        btn_image_to_video.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doBackup();
+            }
+        });
     }
 
     /**
@@ -107,10 +111,11 @@ public class MainActivity extends AppCompatActivity {
     private void doBackup() {
         // 本文主旨是讲解如果动态申请权限, 具体备份代码不再展示, 就假装备份一下
         Toast.makeText(this, "正在将图片转为avi...", Toast.LENGTH_SHORT).show();
+        //非openGL模式
+                test();
 
-//        test();
-
-        new EncodeAndMuxTest().testEncodeVideoToMp4(this, images);
+        //OpenGl模式
+//        new EncodeAndMuxTest().testEncodeVideoToMp4(this, images);
     }
 
     /**
@@ -136,16 +141,16 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 //
-//    private void test() {
-//        String outputPath = new File(OUTPUT_DIR,
-//                "test.avi").toString();
-//        Log.i("test", "-outputPath=" + outputPath);
-//        for (int i = 0; i < images.length; i++) {
-//            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), images[i]);
-//            ImageVideoConverter.convertImageToVideo(bitmap, 6, 1024, 760, outputPath);
-//            Log.i("test", "-i=" + i);
-//        }
-//    }
+    private void test() {
+        String outputPath = new File(OUTPUT_DIR,
+                "test.avi").toString();
+        Log.i("test", "-outputPath=" + outputPath);
+        for (int i = 0; i < images.length; i++) {
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), images[i]);
+            ImageVideoConverter.convertImageToVideo(bitmap, 6, 1024, 760, outputPath);
+            Log.i("test", "-i=" + i);
+        }
+    }
 
     /**
      * 检查是否拥有指定的所有权限
